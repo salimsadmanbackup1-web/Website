@@ -240,13 +240,13 @@
             grid.innerHTML = '';
             snap.forEach(doc => {
                 const m = doc.data();
-                const date = new Date(m.time).toLocaleDateString('bn-BD', { year:'numeric', month:'long', day:'numeric' });
+                const date = new Date(m.time).toLocaleDateString('en-GB', { year:'numeric', month:'long', day:'numeric' });
                 const div = document.createElement('div');
                 div.className = 'memory-item';
                 div.innerHTML = `
                     <img src="${m.img}">
                     <div class="memory-content">
-                        <div class="memory-date">📅 ${date}</div>
+                        <div class="memory-date">🗓️ ${date}</div>
                         <div class="memory-text">${m.text}</div>
                         <div class="actions">
                             <button class="btn btn-edit" onclick="editMemory('${doc.id}', '${encodeURIComponent(m.text)}')">Edit</button>

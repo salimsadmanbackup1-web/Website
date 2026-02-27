@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SADMAN 💞 TASNIM — Private Universe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff4d6d;
+            --secondary: #ff85a1;
+            --bg: #fff0f3;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            min-height: 100vh; color: #444; 
+            overflow-x: hidden;
+        }
+
+        header { text-align:center; padding:40px 20px; color:white; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .container { max-width:900px; margin:auto; padding:20px; position: relative; z-index: 10; }
+        
+        .card { 
+            background: var(--glass); backdrop-filter: blur(10px);
+            border-radius: 25px; padding: 25px; margin-bottom: 25px; 
+            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .hidden { display:none !important; }
+
+        /* Memories Grid */
+        .memory-grid { 
+            display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); 
+            gap:20px; margin-top:20px; 
+        }
+        .memory-item { 
+            background: white; border-radius: 20px; overflow: hidden;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        }
+        .memory-item img, .memory-item video { width: 100%; height: 220px; object-fit: cover; border-bottom: 3px solid var(--bg); display: block; }
+        
+        .memory-content { padding: 15px; }
+        .memory-date { font-size: 0.75rem; color: #888; margin-bottom: 5px; }
+        .memory-text { font-size: 1rem; line-height: 1.4; color: #333; }
+
+        .actions { display: flex; gap: 8px; margin-top: 12px; }
+        .btn { 
+            padding: 10px 15px; border-radius: 12px; border: none; 
+            cursor: pointer; font-weight: 600; transition: 0.3s;
+            font-size: 0.9rem; flex: 1;
+        }
+        .btn-del { background: #ffe5ec; color: #ff4d6d; }
+        .btn-edit { background: #e0f2fe; color: #0284c7; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; margin-top: 15px; }
+        
+        input, textarea { 
+            width: 100%; padding: 12px; margin-top: 10px;
+            border-radius: 12px; border: 1px solid #ddd; outline: none;
+        }
+
+        .tabs { display:flex; gap:10px; justify-content:center; margin-bottom:25px; flex-wrap: wrap; }
+        .tab-btn { 
+            background: rgba(255,255,255,0.5); border:none; padding:10px 20px; 
+            border-radius:999px; cursor:pointer; font-weight:600; color: #ff4d6d;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        #progressContainer { width: 100%; background: #eee; border-radius: 10px; margin-top: 15px; height: 18px; position: relative; overflow: hidden; }
+        #progressBar { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s; }
+        #progressText { position: absolute; width: 100%; text-align: center; top: 0; font-size: 11px; line-height: 18px; font-weight: 600; color: #000; }
+
+        .forgot-link { display: block; text-align: center; margin-top: 15px; color: #ff4d6d; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+        .heart { position: fixed; color: var(--primary); opacity: 0.5; pointer-events: none; animation: fly 5s linear infinite; z-index: 1; }
+        @keyframes fly { 0% { transform: translateY(100vh) scale(0); opacity: 1; } 100% { transform: translateY(-10vh) scale(1.5); opacity: 0; } }
+        
+        #bgMusic { display: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SADMAN 💝 TASNIM</h1>
+    <p>Our own world</p>
+</header>
+
+<audio id="bgMusic" loop></audio>
+
+<div class="container" id="loginSection">
+    <div class="card" id="mainLogin" style="max-width: 400px; margin: auto;">
+        <h2 style="text-align: center; margin-bottom: 20px;">🔐 Private Access</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn btn-primary" onclick="login()">Login</button>
+        <span class="forgot-link" onclick="toggleForgot(true)">Forgot Password?</span>
+    </div>
+
+    <div id="forgotArea" class="card hidden" style="max-width: 400px; margin: auto;">
+        <h3 style="text-align: center;">🗝️ Reset Access</h3>
+        <p style="font-size: 0.8rem; color: #666; text-align: center; margin-bottom: 10px;">Use your Master Key to reset login info.</p>
+        <input type="password" id="forgotMaster" placeholder="Enter Master Key">
+        <input type="text" id="forgotUser" placeholder="New Username">
+        <input type="password" id="forgotPass" placeholder="New Password">
+        <button class="btn btn-primary" onclick="resetLogin()">Reset Now</button>
+        <button class="btn" style="width: 100%; margin-top: 8px; background: #eee;" onclick="toggleForgot(false)">Cancel</button>
+    </div>
+</div>
+
+<div class="container hidden" id="appSection">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('viewMemories', this)">📸 Memories</button>
+        <button class="tab-btn" onclick="showTab('addForm', this)">➕ New</button>
+        <button class="tab-btn" onclick="showTab('settings', this)">⚙️ Settings</button>
+        <button class="tab-btn" style="color: grey;" onclick="logout()">Logout</button>
+    </div>
+
+    <div id="viewMemories" class="tab">
+        <div class="memory-grid" id="memoryGrid"></div>
+    </div>
+
+    <div id="addForm" class="tab hidden">
+        <div class="card">
+            <h3 id="formTitle">ADD NEW MEMORY ❤️</h3>
+            <input type="file" id="photoInput" accept="image/*,video/*">
+            <textarea id="memoryText" rows="4" placeholder="Share your feelings..."></textarea>
+            <input type="hidden" id="editId">
+            
+            <div id="progressContainer" class="hidden">
+                <div id="progressBar"></div>
+                <div id="progressText">0%</div>
+            </div>
+
+            <button class="btn btn-primary" id="saveBtn" onclick="handleSave()">Save Memory ❤️</button>
+        </div>
+    </div>
+
+    <div id="settings" class="tab hidden">
+        <div class="card">
+            <h3>🎵 Background Music</h3>
+            <input type="text" id="songUrl" placeholder="Paste mp3 direct link">
+            <button class="btn btn-primary" onclick="updateSong()">Update & Play</button>
+            
+            <div style="border-top: 1px solid #ddd; margin: 25px 0;"></div>
+            <h3>🔐 Update Login Info</h3>
+            <input type="password" id="adminPass" placeholder="Current Master Password">
+            <input type="text" id="newUser" placeholder="New Username">
+            <input type="password" id="newPass" placeholder="New Password">
+            <button class="btn btn-primary" onclick="changeLogin()">Update Login</button>
+
+            <div style="border-top: 1px solid #ddd; margin: 25px 0;"></div>
+            <h3>🗝️ Change Master Key</h3>
+            <input type="password" id="oldMaster" placeholder="Old Master Key">
+            <input type="password" id="newMaster" placeholder="New Master Key">
+            <button class="btn btn-primary" style="background: #333;" onclick="updateMasterPass()">Change Master Key</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCTAIWwavQ9rPL2DjlbMvYPAHlZUkDphl8",
+        authDomain: "testing2-ef294.firebaseapp.com",
+        databaseURL: "https://testing2-ef294-default-rtdb.firebaseio.com",
+        projectId: "testing2-ef294",
+        storageBucket: "testing2-ef294.firebasestorage.app",
+        messagingSenderId: "101601598928",
+        appId: "1:101601598928:web:a612b801372f4c701eedd5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let ADMIN_SECRET = "salim sadman shoron";
+    let loginData = { user: "turuturu", pass: "turuturu" };
+
+    // ফায়ারবেস থেকে কনফিগ সিঙ্ক করা
+    async function syncConfig() {
+        try {
+            const mDoc = await db.collection('config').doc('master').get();
+            if(mDoc.exists) ADMIN_SECRET = mDoc.data().key;
+            const lDoc = await db.collection('config').doc('login').get();
+            if(lDoc.exists) loginData = lDoc.data();
+            const music = await db.collection('config').doc('music').get();
+            if(music.exists && music.data().url) {
+                document.getElementById('bgMusic').src = music.data().url;
+            }
+        } catch(e) { console.error("Sync Error:", e); }
+    }
+    syncConfig();
+
+    async function login() {
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        await syncConfig();
+        if(u === loginData.user && p === loginData.pass) {
+            localStorage.setItem('loveLogin', 'yes');
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('appSection').classList.remove('hidden');
+            loadMemories();
+            document.getElementById('bgMusic').play().catch(()=>{});
+        } else { alert('Wrong Username or Password! 😢'); }
+    }
+
+    if(localStorage.getItem('loveLogin') === 'yes') {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('appSection').classList.remove('hidden');
+        setTimeout(loadMemories, 500);
+        setTimeout(() => document.getElementById('bgMusic').play().catch(()=>{}), 2000);
+    }
+
+    async function handleSave() {
+        const fileInput = document.getElementById('photoInput');
+        const text = document.getElementById('memoryText').value.trim();
+        const editId = document.getElementById('editId').value;
+        if(!text) return alert('Please write something! ❤️');
+
+        const saveBtn = document.getElementById('saveBtn');
+        const progCont = document.getElementById('progressContainer');
+        const progBar = document.getElementById('progressBar');
+        const progText = document.getElementById('progressText');
+
+        saveBtn.disabled = true;
+        let imgData = null;
+
+        if(fileInput.files[0]) {
+            progCont.classList.remove('hidden');
+            imgData = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const p = Math.round((e.loaded / e.total) * 100);
+                        progBar.style.width = p + "%";
+                        progText.innerText = p + "% processed";
+                    }
+                };
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(fileInput.files[0]);
+            });
+        }
+
+        const payload = { text: text, time: Date.now() };
+        if(imgData) payload.img = imgData;
+
+        try {
+            if(editId) {
+                await db.collection('memories').doc(editId).update(payload);
+            } else {
+                if(!imgData) throw new Error("Please select a photo or video!");
+                await db.collection('memories').add(payload);
+            }
+            alert('Memory Saved! ✅');
+            resetForm(); showTab('viewMemories', document.querySelector('.tab-btn')); loadMemories();
+        } catch (e) { alert(e.message); }
+        finally {
+            saveBtn.disabled = false;
+            progCont.classList.add('hidden');
+        }
+    }
+
+    async function loadMemories() {
+        const grid = document.getElementById('memoryGrid');
+        grid.innerHTML = '<p style="text-align:center;">Loading Memories...</p>';
+        try {
+            const snap = await db.collection('memories').orderBy('time', 'desc').get();
+            grid.innerHTML = '';
+            snap.forEach(doc => {
+                const m = doc.data();
+                const date = new Date(m.time).toLocaleDateString('en-GB');
+                const isVideo = m.img && m.img.includes('video');
+                const media = isVideo ? `<video src="${m.img}" controls></video>` : `<img src="${m.img}">`;
+                grid.innerHTML += `
+                    <div class="memory-item">
+                        ${media}
+                        <div class="memory-content">
+                            <div class="memory-date">🗓️ ${date}</div>
+                            <div class="memory-text">${m.text}</div>
+                            <div class="actions">
+                                <button class="btn btn-edit" onclick="editMem('${doc.id}', '${encodeURIComponent(m.text)}')">Edit</button>
+                                <button class="btn btn-del" onclick="deleteMem('${doc.id}')">Delete</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        } catch(e) { grid.innerHTML = '<p>No memories found.</p>'; }
+    }
+
+    function editMem(id, text) {
+        document.getElementById('editId').value = id;
+        document.getElementById('memoryText').value = decodeURIComponent(text);
+        document.getElementById('formTitle').innerText = "EDIT MEMORY ✏️";
+        showTab('addForm', document.querySelectorAll('.tab-btn')[1]);
+    }
+
+    async function deleteMem(id) { if(confirm('Delete this memory?')) { await db.collection('memories').doc(id).delete(); loadMemories(); } }
+
+    async function changeLogin() {
+        const master = document.getElementById('adminPass').value.trim();
+        if(master !== ADMIN_SECRET) return alert("Incorrect Master Password!");
+        await db.collection('config').doc('login').set({ user: document.getElementById('newUser').value.trim(), pass: document.getElementById('newPass').value.trim() });
+        alert("Login Credentials Updated! ✅"); location.reload();
+    }
+
+    async function updateMasterPass() {
+        const old = document.getElementById('oldMaster').value.trim();
+        const newM = document.getElementById('newMaster').value.trim();
+        if(old !== ADMIN_SECRET) return alert("Wrong Old Key!");
+        await db.collection('config').doc('master').set({ key: newM });
+        alert("Master Key Changed! ✅"); location.reload();
+    }
+
+    async function resetLogin() {
+        const master = document.getElementById('forgotMaster').value.trim();
+        if(master !== ADMIN_SECRET) return alert("Wrong Master Key!");
+        await db.collection('config').doc('login').set({ user: document.getElementById('forgotUser').value.trim(), pass: document.getElementById('forgotPass').value.trim() });
+        alert("Login Info Reset Done! ✅"); location.reload();
+    }
+
+    async function updateSong() {
+        const url = document.getElementById('songUrl').value.trim();
+        await db.collection('config').doc('music').set({ url });
+        document.getElementById('bgMusic').src = url;
+        document.getElementById('bgMusic').play();
+        alert("Music Updated!");
+    }
+
+    function toggleForgot(show) {
+        document.getElementById('forgotArea').classList.toggle('hidden', !show);
+        document.getElementById('mainLogin').classList.toggle('hidden', show);
+    }
+
+    function showTab(id, btn) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function resetForm() {
+        document.getElementById('editId').value = '';
+        document.getElementById('memoryText').value = '';
+        document.getElementById('photoInput').value = '';
+        document.getElementById('formTitle').innerText = "ADD NEW MEMORY ❤️";
+    }
+
+    function logout() { localStorage.removeItem('loveLogin'); location.reload(); }
+
+    // Heart Animation
+    setInterval(() => {
+        const heart = document.createElement('div'); heart.className = 'heart'; heart.innerHTML = '❤️';
+        heart.style.left = Math.random() * 100 + 'vw'; heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(heart); setTimeout(() => heart.remove(), 5000);
+    }, 1000);
+</script>
+</body>
+</html>resetForm() { 
+        document.getElementById('editId').value = '';
+        document.getElementById('mediaInput').value = ''; 
+        document.getElementById('memoryText').value = ''; 
+        document.getElementById('formTitle').innerText = "Add New Memory ❤️";
+        document.getElementById('uploadArea').classList.add('hidden'); 
+        document.getElementById('cancelEdit').style.display = "none";
+        document.getElementById('modeButtons').style.display = "flex";
+    }
+
+    function logout() { localStorage.removeItem('loveLogin'); location.reload(); }
+    function toggleModal(id, show) { document.getElementById(id).classList.toggle('hidden', !show); }
+
+    setInterval(() => {
+        const heart = document.createElement('div'); heart.className = 'heart'; heart.innerHTML = '❤️';
+        heart.style.left = Math.random() * 100 + 'vw'; heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(heart); setTimeout(() => heart.remove(), 5000);
+    }, 1000);
+</script>
+</body>
+</html>

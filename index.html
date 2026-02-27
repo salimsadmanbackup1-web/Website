@@ -82,15 +82,15 @@
 
 <header>
     <h1>SADMAN 💝 TASNIM</h1>
-    <p>আমাদের একান্ত পৃথিবী</p>
+    <p>Our own world</p>
 </header>
 
 <div class="container" id="loginSection">
     <div class="card" style="max-width: 400px; margin: auto;">
         <h2 style="text-align: center; margin-bottom: 20px;">🔐 Private Access</h2>
-        <input type="text" id="username" placeholder="ইউজারনেম">
-        <input type="password" id="password" placeholder="পাসওয়ার্ড">
-        <button class="btn btn-primary" onclick="login()">প্রবেশ করুন</button>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password ">
+        <button class="btn btn-primary" onclick="login()">Login</button>
     </div>
 </div>
 
@@ -108,9 +108,9 @@
 
     <div id="addForm" class="tab hidden">
         <div class="card">
-            <h3 id="formTitle">নতুন স্মৃতি যোগ করো</h3>
+            <h3 id="formTitle">ADD NEW MEMORY </h3>
             <input type="file" id="photoInput" accept="image/*">
-            <textarea id="memoryText" rows="4" placeholder="আজকের দিনটি কেমন ছিল?"></textarea>
+            <textarea id="memoryText" rows="4" placeholder="How was your day?"></textarea>
             <input type="hidden" id="editId">
             <button class="btn btn-primary" id="saveBtn" onclick="handleSave()">Save Memory ❤️</button>
         </div>
@@ -119,9 +119,9 @@
     <div id="settings" class="tab hidden">
         <div class="card">
             <h3>Update Admin Settings</h3>
-            <input type="password" id="adminPass" placeholder="বর্তমান মাস্টার পাসওয়ার্ড">
-            <input type="text" id="newUser" placeholder="নতুন ইউজারনেম">
-            <input type="password" id="newPass" placeholder="নতুন পাসওয়ার্ড">
+            <input type="password" id="adminPass" placeholder="Master Password">
+            <input type="text" id="newUser" placeholder="New username">
+            <input type="password" id="newPass" placeholder="New password">
             <button class="btn btn-primary" onclick="changeLogin()">Update Credentials</button>
         </div>
     </div>
@@ -166,11 +166,11 @@
                 document.getElementById('appSection').classList.remove('hidden');
                 loadMemories();
             } else {
-                alert('ভুল ইউজারনেম বা পাসওয়ার্ড! 😢');
+                alert('wrong password or username  😢');
             }
         } catch (e) {
             console.error(e);
-            alert("কানেকশন এরর! ফায়ারবেস রুলস বা কালেকশন চেক করো।");
+            alert("CHECK YOUR INTERNET CONNECTION ");
         }
     }
 
@@ -199,7 +199,7 @@
         const fileInput = document.getElementById('photoInput');
         const text = document.getElementById('memoryText').value.trim();
         const editId = document.getElementById('editId').value;
-        if(!text) return alert('কিছু তো লিখো! ❤️');
+        if(!text) return alert('Write Something! ❤️');
 
         const saveBtn = document.getElementById('saveBtn');
         saveBtn.innerText = "Saving...";
@@ -216,10 +216,10 @@
             if(editId) {
                 await db.collection('memories').doc(editId).update(payload);
             } else {
-                if(!imgData) throw new Error("ছবি ছাড়া স্মৃতি অসম্পূর্ণ!");
+                if(!imgData) throw new Error("Memories are incomplete without pictures!");
                 await db.collection('memories').add(payload);
             }
-            alert('সফলভাবে সেভ হয়েছে! ✅');
+            alert('Save successful! ✅');
             resetForm();
             showTab('viewMemories', document.querySelector('.tab-btn'));
             loadMemories();
@@ -234,7 +234,7 @@
     // মেমরি লোড করা
     async function loadMemories() {
         const grid = document.getElementById('memoryGrid');
-        grid.innerHTML = '<p style="text-align:center; color:white;">স্মৃতিগুলো লোড হচ্ছে...</p>';
+        grid.innerHTML = '<p style="text-align:center; color:white;">Loading...</p>';
         try {
             const snap = await db.collection('memories').orderBy('time', 'desc').get();
             grid.innerHTML = '';
@@ -256,19 +256,19 @@
                 grid.appendChild(div);
             });
         } catch(e) { 
-            grid.innerHTML = '<p style="text-align:center; color:white;">এখনও কোনো স্মৃতি নেই।</p>';
+            grid.innerHTML = '<p style="text-align:center; color:white;">There are no memories yet</p>';
         }
     }
 
     function editMemory(id, text) {
         document.getElementById('editId').value = id;
         document.getElementById('memoryText').value = decodeURIComponent(text);
-        document.getElementById('formTitle').innerText = "স্মৃতি এডিট করো ✏️";
+        document.getElementById('formTitle').innerText = "Edit";
         showTab('addForm', document.querySelectorAll('.tab-btn')[1]);
     }
 
     async function deleteMemory(id) {
-        if(confirm('স্মৃতিটি মুছে ফেলতে চাও?')) {
+        if(confirm('Do you want to remove?')) {
             await db.collection('memories').doc(id).delete();
             loadMemories();
         }
@@ -278,7 +278,7 @@
         document.getElementById('editId').value = '';
         document.getElementById('memoryText').value = '';
         document.getElementById('photoInput').value = '';
-        document.getElementById('formTitle').innerText = "নতুন স্মৃতি যোগ করো";
+        document.getElementById('formTitle').innerText = "Add new memory";
     }
 
     function compressImage(file) {

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SADMAN 💞 TASNIM — Private Universe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #ff4d6d; --secondary: #ff85a1; --bg: #fff0f3; --glass: rgba(255, 255, 255, 0.96); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); min-height: 100vh; color: #444; overflow-x: hidden; }
+        header { text-align:center; padding:30px 20px; color:white; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .counter-container { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 20px; padding: 12px 20px; margin: 10px auto; display: inline-block; border: 1px solid rgba(255,255,255,0.4); }
+        .counter-display { font-size: 1.1rem; font-weight: 600; }
+        .nav-trigger { background: var(--glass); color: var(--primary); padding: 10px 25px; border-radius: 50px; font-weight: 600; cursor: pointer; display: inline-block; margin-top: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: var(--glass); z-index: 1000; transition: 0.4s; padding: 40px 20px; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+        .side-menu.active { left: 0; }
+        .menu-item { padding: 15px; margin-bottom: 12px; border-radius: 15px; background: white; font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid #ffeef2; }
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index: 999; display:none; backdrop-filter: blur(2px); }
+        .container { max-width:900px; margin:auto; padding:15px; padding-bottom: 80px; }
+        .card { background: var(--glass); backdrop-filter: blur(10px); border-radius: 25px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.1); }
+        .hidden { display:none !important; }
+        #chatDisplay { height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 15px; background: #fff8f9; border-radius: 20px; margin-bottom: 15px; }
+        .msg-wrap { display: flex; width: 100%; }
+        .sent-wrap { justify-content: flex-end; }
+        .msg { max-width: 75%; padding: 8px 14px; border-radius: 15px; font-size: 0.85rem; }
+        .msg-sent { background: var(--primary); color: white; }
+        .msg-rec { background: white; border: 1px solid #eee; }
+        .memory-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:20px; }
+        .memory-item { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .memory-item img { width: 100%; height: 250px; object-fit: cover; }
+        .mem-date { font-size: 0.65rem; color: #aaa; margin-top: 5px; }
+        #canvasBox { border: 2px dashed var(--primary); border-radius: 20px; background: white; touch-action: none; width: 100%; height: 350px; cursor: crosshair; }
+        .color-picker { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; align-items: center; }
+        .color-circle { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .emoji-box { font-size: 2.5rem; cursor: pointer; padding: 10px; }
+        .emoji-box.selected { border: 2px solid var(--primary); border-radius: 15px; background: rgba(255, 77, 109, 0.1); }
+        .progress-box { width: 100%; background: #eee; height: 10px; border-radius: 5px; margin-top: 10px; overflow: hidden; display: none; }
+        #progressBar { width: 0%; height: 100%; background: var(--primary); transition: 0.3s; }
+        input, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 12px; border: 1px solid #eee; outline: none; }
+        .btn { padding: 10px 18px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; margin-top: 10px; }
+        .credit-text { text-align: center; margin: 30px 0; font-size: 1.1rem; font-weight: 800; color: #fff; text-shadow: 2px 2px 8px rgba(255, 77, 109, 0.8); }
+        #sketchGallery { margin-top: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .sketch-item img { width: 100%; border-radius: 15px; border: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SADMAN 💝 TASNIM</h1>
+    <div id="timerContainer" class="counter-container hidden">
+        <div style="font-size: 0.75rem; margin-bottom: 5px; opacity: 0.9;">Your love has blossomed for...</div>
+        <div class="counter-display" id="loveCounter">00 Days 00 Hours 00 Minutes 00 Seconds</div>
+    </div>
+    <br>
+    <div class="nav-trigger hidden" id="navTrigger" onclick="toggleMenu(true)">Secret Access ✨</div>
+</header>
+
+<div class="overlay" id="overlay" onclick="toggleMenu(false)"></div>
+<div class="side-menu" id="sideMenu">
+    <h2 style="color:var(--primary); margin-bottom:20px;">Menu</h2>
+    <div class="menu-item" onclick="showSection('viewMemories')">🏠 Memories Home</div>
+    <div class="menu-item" onclick="showSection('chatTab')">💬 Private Chat</div>
+    <div class="menu-item" onclick="showSection('moodTab')">✨ Daily Mood</div>
+    <div class="menu-item" onclick="showSection('drawTab')">🎨 Drawing Pad</div>
+    <div class="menu-item" onclick="showSection('addForm')">📸 Add New Memory</div>
+    <div class="menu-item" onclick="showSection('settings')">⚙️ Settings</div>
+    <div class="menu-item" style="color: #888;" onclick="logout()">✕ Logout</div>
+</div>
+
+<div class="container" id="loginSection">
+    <div class="card" style="max-width: 400px; margin: auto;">
+        <h2 style="text-align: center;">🔐 Private World</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn btn-primary" onclick="login()">Enter</button>
+        <p style="text-align:center; font-size:0.8rem; margin-top:15px; color:var(--primary); cursor:pointer;" onclick="forgetPass()">Lost Password?</p>
+    </div>
+    <div class="credit-text">Made with love for Tasnim ❤️</div>
+</div>
+
+<div class="container hidden" id="appSection">
+    <div id="viewMemories" class="section">
+        <div class="memory-grid" id="memoryGrid"></div>
+    </div>
+
+    <div id="chatTab" class="section hidden">
+        <div class="card">
+            <h3>💬 Our Secret Chat</h3>
+            <div id="chatDisplay"></div>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="chatInput" placeholder="Message..." onkeypress="if(event.key==='Enter') sendChat()">
+                <button class="btn btn-primary" style="width:80px;" onclick="sendChat()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="moodTab" class="section hidden">
+        <div class="card">
+            <h3>Current Mood 🧸</h3>
+            <div id="emojiPalette" style="display:flex; justify-content:space-around; margin:15px 0;">
+                <span class="emoji-box" onclick="selectEmoji('😭', this)">😭</span>
+                <span class="emoji-box" onclick="selectEmoji('😛', this)">😛</span>
+                <span class="emoji-box" onclick="selectEmoji('😤', this)">😤</span>
+                <span class="emoji-box" onclick="selectEmoji('💞', this)">💞</span>
+            </div>
+            <input type="text" id="moodNote" placeholder="Note about this vibe...">
+            <button class="btn btn-primary" onclick="saveMood()">Save Vibe</button>
+            <div id="moodDisplay" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;"></div>
+        </div>
+    </div>
+
+    <div id="drawTab" class="section hidden">
+        <div class="card">
+            <h3>🎨 Sketch Pad</h3>
+            <div class="color-picker">
+                <div class="color-circle" style="background: #ff4d6d" onclick="changeColor('#ff4d6d')"></div>
+                <div class="color-circle" style="background: #000" onclick="changeColor('#000')"></div>
+                <div class="color-circle" style="background: #2196F3" onclick="changeColor('#2196F3')"></div>
+                <input type="color" onchange="changeColor(this.value)" style="width:30px; height:30px; border:none; cursor:pointer;">
+            </div>
+            <canvas id="canvasBox"></canvas>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn btn-primary" style="flex:2" onclick="saveDrawing()">Save Sketch</button>
+                <button class="btn" style="flex:1; background:#ddd;" onclick="clearCanvas()">Clear</button>
+            </div>
+            <div id="sketchGallery"></div>
+        </div>
+    </div>
+
+    <div id="addForm" class="section hidden">
+        <div class="card">
+            <h3>📸 New Memory</h3>
+            <input type="file" id="photoInput" accept="image/*">
+            <textarea id="memoryText" placeholder="The story..."></textarea>
+            <div class="progress-box" id="pBox"><div id="progressBar"></div></div>
+            <button class="btn btn-primary" onclick="handleSave()">Store Memory ❤️</button>
+        </div>
+    </div>
+
+    <div id="settings" class="section hidden">
+        <div class="card">
+            <h3>⚙️ Settings</h3>
+            <input type="password" id="authMK" placeholder="Master Key">
+            <input type="text" id="setNewU" placeholder="New Username">
+            <input type="password" id="setNewP" placeholder="New Password">
+            <button class="btn btn-primary" onclick="updateLogin()">Update Login</button>
+            <hr style="margin:20px 0; opacity:0.1">
+            <input type="password" id="oldMK" placeholder="Old Master Key">
+            <input type="password" id="newMK" placeholder="New Master Key">
+            <button class="btn btn-primary" onclick="updateMaster()">Update Master Key</button>
+        </div>
+    </div>
+    <div class="credit-text">Made with love for Tasnim ❤️</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCTAIWwavQ9rPL2DjlbMvYPAHlZUkDphl8",
+        authDomain: "testing2-ef294.firebaseapp.com",
+        projectId: "testing2-ef294",
+        storageBucket: "testing2-ef294.firebasestorage.app",
+        appId: "1:101601598928:web:a612b801372f4c701eedd5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let ADMIN_SECRET = "salim sadman shoron";
+    let loginData = { user: "turuturu", pass: "turuturu" };
+
+    async function sync() {
+        const m = await db.collection('config').doc('master').get();
+        if(m.exists) ADMIN_SECRET = m.data().key;
+        const l = await db.collection('config').doc('login').get();
+        if(l.exists) loginData = l.data();
+    }
+
+    async function login() {
+        await sync();
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        if(u === loginData.user && p === loginData.pass) {
+            localStorage.setItem('loveLogin', 'yes');
+            localStorage.setItem('loveUser', u);
+            location.reload();
+        } else alert("Denied.");
+    }
+
+    if(localStorage.getItem('loveLogin') === 'yes') {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('appSection').classList.remove('hidden');
+        document.getElementById('timerContainer').classList.remove('hidden');
+        document.getElementById('navTrigger').classList.remove('hidden');
+        sync(); loadMemories(); listenChat(); loadSketches();
+    }
+
+    // MOOD LOGIC (With Delete)
+    let selMood = "";
+    function selectEmoji(e, el) { selMood = e; document.querySelectorAll('.emoji-box').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); }
+    async function saveMood() {
+        if(!selMood) return alert("Select an emoji!");
+        await db.collection('moods').add({ emoji: selMood, note: document.getElementById('moodNote').value, time: Date.now() });
+        alert("Mood Saved!"); loadMoods();
+    }
+    async function loadMoods() {
+        const disp = document.getElementById('moodDisplay');
+        const snap = await db.collection('moods').orderBy('time', 'desc').get();
+        disp.innerHTML = "<h4>Your Vibes Log:</h4>";
+        snap.forEach(doc => {
+            const m = doc.data();
+            disp.innerHTML += `<div style="padding:10px; background:white; border-radius:12px; margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+                <span>${m.emoji} - ${m.note}</span>
+                <button onclick="delMood('${doc.id}')" style="background:none; border:none; color:red; cursor:pointer; font-size:0.7rem;">Delete</button>
+            </div>`;
+        });
+    }
+    async function delMood(id) { if(prompt("Master Key:") === ADMIN_SECRET) { await db.collection('moods').doc(id).delete(); loadMoods(); } }
+
+    // DRAWING
+    const canvas = document.getElementById('canvasBox');
+    const ctx = canvas.getContext('2d');
+    let drawing = false, strokeColor = "#ff4d6d";
+    function initCanvas() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; ctx.lineCap = "round"; ctx.lineWidth = 4; }
+    function changeColor(c) { strokeColor = c; }
+    function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); }
+    const getPos = (e) => { const r = canvas.getBoundingClientRect(); const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: cx - r.left, y: cy - r.top }; }
+    ['mousedown','touchstart'].forEach(ev => canvas.addEventListener(ev, (e) => { drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); if(e.touches) e.preventDefault(); }));
+    ['mousemove','touchmove'].forEach(ev => canvas.addEventListener(ev, (e) => { if(!drawing) return; const p = getPos(e); ctx.strokeStyle = strokeColor; ctx.lineTo(p.x, p.y); ctx.stroke(); if(e.touches) e.preventDefault(); }));
+    ['mouseup','touchend'].forEach(ev => canvas.addEventListener(ev, () => drawing = false));
+    async function saveDrawing() { await db.collection('sketches').add({ img: canvas.toDataURL(), time: Date.now() }); alert("Saved!"); clearCanvas(); loadSketches(); }
+    async function loadSketches() { const gal = document.getElementById('sketchGallery'); const snap = await db.collection('sketches').orderBy('time', 'desc').get(); gal.innerHTML = ""; snap.forEach(doc => { gal.innerHTML += `<div class="sketch-item" onclick="delSketch('${doc.id}')"><img src="${doc.data().img}"></div>`; }); }
+    async function delSketch(id) { if(prompt("Master Key:") === ADMIN_SECRET) { await db.collection('sketches').doc(id).delete(); loadSketches(); } }
+
+    // MEMORIES, CHAT, SETTINGS
+    async function handleSave() {
+        const file = document.getElementById('photoInput').files[0];
+        const text = document.getElementById('memoryText').value;
+        if(!file || !text) return alert("Fill fields!");
+        document.getElementById('pBox').style.display = "block";
+        const r = new FileReader(); r.readAsDataURL(file);
+        r.onload = (e) => {
+            const img = new Image(); img.src = e.target.result;
+            img.onload = async () => {
+                const c = document.createElement('canvas');
+                let w = img.width, h = img.height, max = 1000;
+                if(w > max) { h *= max/w; w = max; }
+                c.width = w; c.height = h;
+                c.getContext('2d').drawImage(img, 0, 0, w, h);
+                await db.collection('memories').add({ text, img: c.toDataURL('image/jpeg', 0.7), time: Date.now() });
+                location.reload();
+            };
+        };
+    }
+    async function loadMemories() {
+        const grid = document.getElementById('memoryGrid');
+        const snap = await db.collection('memories').orderBy('time', 'desc').get();
+        grid.innerHTML = "";
+        snap.forEach(doc => {
+            const m = doc.data();
+            const d = new Date(m.time).toLocaleString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+            grid.innerHTML += `<div class="memory-item"><img src="${m.img}"><div style="padding:15px;"><p>${m.text}</p><div class="mem-date">Added: ${d}</div><div style="margin-top:10px;"><button class="btn" style="font-size:0.7rem;" onclick="editMem('${doc.id}', '${m.text}')">Edit</button><button class="btn" style="color:red; font-size:0.7rem;" onclick="delMem('${doc.id}')">Delete</button></div></div></div>`;
+        });
+    }
+    async function editMem(id, cur) { const nt = prompt("Edit:", cur); if(nt) await db.collection('memories').doc(id).update({ text: nt }); loadMemories(); }
+    async function delMem(id) { if(prompt("Key:") === ADMIN_SECRET) { await db.collection('memories').doc(id).delete(); loadMemories(); } }
+    function listenChat() { db.collection('chats').orderBy('time', 'asc').onSnapshot(snap => { const disp = document.getElementById('chatDisplay'); disp.innerHTML = ""; snap.forEach(doc => { const isMe = doc.data().user === localStorage.getItem('loveUser'); disp.innerHTML += `<div class="msg-wrap ${isMe ? 'sent-wrap' : ''}"><div class="msg ${isMe ? 'msg-sent' : 'msg-rec'}" onclick="delChat('${doc.id}')">${doc.data().text}</div></div>`; }); disp.scrollTop = disp.scrollHeight; }); }
+    async function sendChat() { const inp = document.getElementById('chatInput'); if(inp.value.trim()) { await db.collection('chats').add({ user: localStorage.getItem('loveUser'), text: inp.value, time: Date.now() }); inp.value = ""; } }
+    async function delChat(id) { if(prompt("Key:") === ADMIN_SECRET) await db.collection('chats').doc(id).delete(); }
+    async function updateLogin() { if(document.getElementById('authMK').value === ADMIN_SECRET) { await db.collection('config').doc('login').set({ user: document.getElementById('setNewU').value, pass: document.getElementById('setNewP').value }); logout(); } }
+    async function updateMaster() { if(document.getElementById('oldMK').value === ADMIN_SECRET) { await db.collection('config').doc('master').set({ key: document.getElementById('newMK').value }); location.reload(); } }
+    function forgetPass() { if(prompt("Key:") === ADMIN_SECRET) alert(`U: ${loginData.user} P: ${loginData.pass}`); }
+    function logout() { localStorage.clear(); location.reload(); }
+    function toggleMenu(s) { document.getElementById('sideMenu').classList.toggle('active', s); document.getElementById('overlay').style.display = s ? 'block' : 'none'; }
+    function showSection(id) { document.querySelectorAll('.section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id === 'drawTab') setTimeout(initCanvas, 100); if(id === 'moodTab') loadMoods(); toggleMenu(false); }
+    setInterval(() => { const diff = new Date() - new Date("2025-02-13T11:14:00"); const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000); document.getElementById('loveCounter').innerText = `${d} Days ${h} Hours ${m} Minutes ${s} Seconds`; }, 1000);
+</script>
+</body>
+</html>

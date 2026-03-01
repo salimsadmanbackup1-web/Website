@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SADMAN 💞 TASNIM — Universe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary: #ff4d6d; --secondary: #ff85a1; --bg: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); --glass: rgba(255, 255, 255, 0.96); --text: #444; }
+        .dark-mode { --primary: #ff758c; --secondary: #ffacbf; --bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); --glass: rgba(20, 20, 40, 0.95); --text: #eee; }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: 0.3s; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); overflow-x: hidden; }
+        header { text-align:center; padding:20px; color:white; }
+        .counter-container { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 20px; padding: 15px; margin: 10px auto; display: inline-block; border: 1px solid rgba(255,255,255,0.4); }
+        .nav-trigger { background: var(--glass); color: var(--primary); padding: 10px 25px; border-radius: 50px; font-weight: 600; cursor: pointer; display: inline-block; margin-top: 10px; }
+        
+        .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: var(--glass); z-index: 1000; transition: 0.4s; padding: 40px 20px; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+        .side-menu.active { left: 0; }
+        .menu-item { padding: 15px; margin-bottom: 12px; border-radius: 15px; background: rgba(255,255,255,0.5); font-weight: 600; color: var(--primary); cursor: pointer; }
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index: 999; display:none; }
+
+        .container { max-width:900px; margin:auto; padding:15px; padding-bottom: 80px; }
+        .card { background: var(--glass); backdrop-filter: blur(10px); border-radius: 25px; padding: 20px; margin-bottom: 25px; box-shadow: 0 8px 32px rgba(0,0,0,0.05); }
+        .hidden { display:none !important; }
+        
+        .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 250px; margin: 20px auto; }
+        .ttt-cell { aspect-ratio: 1/1; background: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600; color: var(--primary); cursor: pointer; border: 1px solid #eee; }
+
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 12px; border: 1px solid #ddd; background: rgba(255,255,255,0.8); }
+        .btn { padding: 10px 18px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; margin-top: 5px; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .emoji-btn { font-size: 2rem; cursor: pointer; opacity: 0.4; }
+        .emoji-btn.selected { opacity: 1; transform: scale(1.2); }
+        .memory-card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 20px; position: relative; }
+        .memory-card img { width: 100%; border-radius: 15px; margin-bottom: 10px; }
+        .time-label { font-size: 0.7rem; color: #888; display: block; margin-bottom: 5px; }
+        .credit { text-align: center; color: white; padding: 20px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SADMAN 💝 TASNIM</h1>
+    <div id="timerContainer" class="counter-container hidden">
+        <p style="font-size: 0.8rem; margin-bottom: 5px;">We are together since...</p>
+        <div class="counter-display" id="loveCounter" style="font-size: 1.2rem; font-weight: 600;">Loading...</div>
+    </div>
+    <div id="complimentBox" style="color:white; font-style:italic; margin-top:5px; padding: 0 10px;">Loading love... ❤️</div>
+    <div class="nav-trigger hidden" id="navTrigger" onclick="toggleMenu(true)">Explore Universe ✨</div>
+</header>
+
+<div class="overlay" id="overlay" onclick="toggleMenu(false)"></div>
+<div class="side-menu" id="sideMenu">
+    <div class="menu-item" onclick="showSection('viewMemories')">🏠 Memories</div>
+    <div class="menu-item" onclick="showSection('playTab')">🎮 Play Zone</div>
+    <div class="menu-item" onclick="showSection('chatTab')">💬 Chat</div>
+    <div class="menu-item" onclick="showSection('moodTab')">📊 Moods</div>
+    <div class="menu-item" onclick="showSection('drawTab')">🎨 Draw</div>
+    <div class="menu-item" onclick="showSection('addForm')">📸 Add Memory</div>
+    <div class="menu-item" onclick="showSection('settings')">⚙️ Settings</div>
+    <div class="menu-item" onclick="logout()">✕ Logout</div>
+</div>
+
+<div class="container" id="loginSection">
+    <div class="card" style="max-width: 400px; margin: auto;">
+        <h2 style="text-align:center;">🔐 Locked</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn btn-primary" onclick="login()">Enter</button>
+        <p style="text-align:center; font-size:0.8rem; margin-top:10px; color:var(--primary); cursor:pointer;" onclick="forgetPass()">Forget Password?</p>
+    </div>
+</div>
+
+<div class="container hidden" id="appSection">
+    <div id="viewMemories" class="section">
+        <div id="memoryGrid"></div>
+    </div>
+
+    <div id="playTab" class="section hidden">
+        <div class="card" style="text-align:center;">
+            <h3>Play Zone</h3>
+            <div style="display:flex; gap:5px; margin-top:10px;">
+                <select id="playerX"><option value="Shoron">X: Shoron</option><option value="Tasnim">X: Tasnim</option></select>
+                <select id="playerO"><option value="Tasnim">O: Tasnim</option><option value="Shoron">O: Shoron</option></select>
+            </div>
+            <button class="btn btn-primary" onclick="assignPlayers()">Lock Names</button>
+            <p id="gameStatus" style="font-weight:bold; margin-top:15px; color:var(--primary);">Ready</p>
+            <div class="ttt-grid" id="tttGrid">
+                <div class="ttt-cell" onclick="makeMove(0)"></div><div class="ttt-cell" onclick="makeMove(1)"></div><div class="ttt-cell" onclick="makeMove(2)"></div>
+                <div class="ttt-cell" onclick="makeMove(3)"></div><div class="ttt-cell" onclick="makeMove(4)"></div><div class="ttt-cell" onclick="makeMove(5)"></div>
+                <div class="ttt-cell" onclick="makeMove(6)"></div><div class="ttt-cell" onclick="makeMove(7)"></div><div class="ttt-cell" onclick="makeMove(8)"></div>
+            </div>
+            <button class="btn" style="background:#eee; width:100%;" onclick="resetGame()">Reset Board</button>
+            <canvas id="gameChart" height="150" style="margin-top:20px;"></canvas>
+        </div>
+    </div>
+
+    <div id="chatTab" class="section hidden">
+        <div class="card">
+            <div id="chatDisplay" style="height:300px; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px;"></div>
+            <div style="display:flex; gap:5px; margin-top:10px;">
+                <input type="text" id="chatInput" placeholder="Message...">
+                <button class="btn btn-primary" style="width:70px;" onclick="sendChat()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="moodTab" class="section hidden">
+        <div class="card">
+            <h3>Moods</h3>
+            <select id="moodUser"><option value="Shoron">Shoron</option><option value="Tasnim">Tasnim</option></select>
+            <div style="display:flex; justify-content:space-around; margin:15px 0;">
+                <span class="emoji-btn" onclick="selectEmoji('😭', this)">😭</span>
+                <span class="emoji-btn" onclick="selectEmoji('😛', this)">😛</span>
+                <span class="emoji-btn" onclick="selectEmoji('😤', this)">😤</span>
+                <span class="emoji-btn" onclick="selectEmoji('💞', this)">💞</span>
+            </div>
+            <input type="text" id="moodNote" placeholder="Notes...">
+            <button class="btn btn-primary" onclick="saveMood()">Save Mood</button>
+            <canvas id="moodChart" height="150" style="margin-top:20px;"></canvas>
+            <div id="moodDisplay" style="margin-top:15px;"></div>
+        </div>
+    </div>
+
+    <div id="drawTab" class="section hidden">
+        <div class="card">
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <input type="color" id="strokeColor" value="#ff4d6d" style="width:50px; height:45px;">
+                <button class="btn" style="background:#eee; flex:1;" onclick="clearCanvas()">Clear</button>
+            </div>
+            <canvas id="canvasBox" style="border:1px dashed var(--primary); width:100%; height:350px; background:white; border-radius:15px; touch-action:none;"></canvas>
+            <button class="btn btn-primary" onclick="saveDrawing()">Save Sketch</button>
+            <div id="sketchGallery" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;"></div>
+        </div>
+    </div>
+
+    <div id="addForm" class="section hidden">
+        <div class="card">
+            <input type="file" id="photoInput" accept="image/*">
+            <textarea id="memoryText" placeholder="Our story..."></textarea>
+            <button class="btn btn-primary" onclick="handleSave()">Store Memory ❤️</button>
+        </div>
+    </div>
+
+    <div id="settings" class="section hidden">
+        <div class="card">
+            <h3>Security</h3>
+            <input type="password" id="authMK" placeholder="Master Key">
+            <input type="text" id="setNewU" placeholder="New Username">
+            <input type="password" id="setNewP" placeholder="New Password">
+            <input type="password" id="setNewMK" placeholder="New Master Key">
+            <button class="btn btn-primary" onclick="updateLogin()">Update Everything</button>
+        </div>
+    </div>
+
+    <div class="credit">Made with love for Tasnim by Shoron ❤️</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyCTAIWwavQ9rPL2DjlbMvYPAHlZUkDphl8", authDomain: "testing2-ef294.firebaseapp.com", projectId: "testing2-ef294", storageBucket: "testing2-ef294.firebasestorage.app", appId: "1:101601598928:web:a612b801372f4c701eedd5" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let ADMIN_SECRET = "salim sadman shoron";
+    let loginData = { user: "turuturu", pass: "turuturu" };
+    let moodChart, gameChart, selectedEmoji = "";
+
+    const compliments = [
+        "You are the best thing that ever happened to me! ❤️",
+        "Every moment with you is a beautiful dream come true. ✨",
+        "Shoron loves Tasnim more than anything in this universe! 💞",
+        "Your smile is my favorite thing in the world. 😊",
+        "Forever isn't long enough with you. ♾️",
+        "You are my moon, my sun, and all my stars. 🌙☀️",
+        "I'm so lucky to have you by my side. 🍀",
+        "You make my heart skip a beat every single day. 💓",
+        "Life is better with you by my side. 💖",
+        "You're my forever and always. 🥂"
+    ];
+
+    async function sync() {
+        const m = await db.collection('config').doc('master').get(); if(m.exists) ADMIN_SECRET = m.data().key;
+        const l = await db.collection('config').doc('login').get(); if(l.exists) loginData = l.data();
+    }
+
+    async function forgetPass() {
+        await sync(); const mk = prompt("Master Key:");
+        if(mk === ADMIN_SECRET) alert(`U: ${loginData.user}\nP: ${loginData.pass}`);
+        else alert("Wrong Key!");
+    }
+
+    async function login() {
+        await sync(); const u = document.getElementById('username').value.trim(); const p = document.getElementById('password').value.trim();
+        if(u === loginData.user && p === loginData.pass) {
+            localStorage.setItem('loveLogin', 'yes'); localStorage.setItem('loveUser', u); location.reload();
+        } else alert("Denied!");
+    }
+
+    if(localStorage.getItem('loveLogin') === 'yes') {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('appSection').classList.remove('hidden');
+        document.getElementById('timerContainer').classList.remove('hidden');
+        document.getElementById('navTrigger').classList.remove('hidden');
+        document.getElementById('complimentBox').innerText = compliments[Math.floor(Math.random() * compliments.length)];
+        sync(); loadMemories(); listenChat(); loadSketches(); listenGame(); loadGameStats();
+    }
+
+    // Timer Logic
+    setInterval(() => {
+        const diff = new Date() - new Date("2025-02-13T11:14:00");
+        const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+        document.getElementById('loveCounter').innerText = `${d}d ${h}h ${m}m ${s}s`;
+    }, 1000);
+
+    // Memory Logic
+    async function loadMemories() {
+        const snap = await db.collection('memories').orderBy('time', 'desc').get();
+        const grid = document.getElementById('memoryGrid'); grid.innerHTML = "";
+        snap.forEach(doc => {
+            const m = doc.data();
+            grid.innerHTML += `<div class="memory-card">
+                <span class="time-label">${new Date(m.time).toLocaleString()}</span>
+                <img src="${m.img}">
+                <p id="text-${doc.id}">${m.text}</p>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn" style="flex:1; background:#eee;" onclick="editMemory('${doc.id}')">Edit</button>
+                    <button class="btn" style="flex:1; background:#ff4d6d; color:white;" onclick="delDoc('memories','${doc.id}',loadMemories)">✕</button>
+                </div>
+            </div>`;
+        });
+    }
+    async function editMemory(id) {
+        // No Master Key required for edit as per request
+        const currentText = document.getElementById(`text-${id}`).innerText;
+        const newText = prompt("Update Memory Story:", currentText);
+        if(newText && newText !== currentText) { 
+            await db.collection('memories').doc(id).update({ text: newText }); 
+            loadMemories(); 
+        }
+    }
+
+    // Mood Logic
+    function selectEmoji(e, el) { selectedEmoji = e; document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); }
+    async function saveMood() {
+        if(!selectedEmoji) return alert("Select Emoji!");
+        await db.collection('moods').add({ user: document.getElementById('moodUser').value, emoji: selectedEmoji, note: document.getElementById('moodNote').value, time: Date.now() });
+        loadMoods();
+    }
+    async function loadMoods() {
+        const snap = await db.collection('moods').orderBy('time', 'desc').get();
+        const counts = { Shoron: 0, Tasnim: 0 };
+        const disp = document.getElementById('moodDisplay'); disp.innerHTML = "";
+        snap.forEach(doc => {
+            const d = doc.data(); counts[d.user]++;
+            disp.innerHTML += `<div style="background:white; padding:10px; border-radius:10px; margin-bottom:5px;">
+                <b>${d.user}: ${d.emoji}</b> - ${d.note} <span onclick="delDoc('moods','${doc.id}',loadMoods)" style="color:red; float:right; cursor:pointer;">✕</span>
+            </div>`;
+        });
+        if(moodChart) moodChart.destroy();
+        moodChart = new Chart(document.getElementById('moodChart'), { type: 'bar', data: { labels: ['Shoron', 'Tasnim'], datasets: [{ label: 'Moods', data: [counts.Shoron, counts.Tasnim], backgroundColor: '#ff4d6d' }] } });
+    }
+
+    // Drawing Logic
+    const canvas = document.getElementById('canvasBox'); const ctx = canvas.getContext('2d');
+    let drawing = false;
+    function initCanvas() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; ctx.lineCap="round"; ctx.lineWidth=4; }
+    function getPos(e) { const r = canvas.getBoundingClientRect(); const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: cx - r.left, y: cy - r.top }; }
+    canvas.addEventListener('touchstart', (e) => { drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); });
+    canvas.addEventListener('touchmove', (e) => { if(drawing) { const p=getPos(e); ctx.strokeStyle=document.getElementById('strokeColor').value; ctx.lineTo(p.x, p.y); ctx.stroke(); } e.preventDefault(); });
+    canvas.addEventListener('touchend', () => drawing=false);
+    function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); }
+    async function saveDrawing() { await db.collection('sketches').add({ img: canvas.toDataURL(), time: Date.now() }); loadSketches(); }
+    async function loadSketches() {
+        const gal = document.getElementById('sketchGallery'); gal.innerHTML = "";
+        const snap = await db.collection('sketches').get();
+        snap.forEach(doc => { gal.innerHTML += `<div style="position:relative;"><img src="${doc.data().img}" style="width:100%; border-radius:10px;"><span onclick="delDoc('sketches','${doc.id}',loadSketches)" style="position:absolute; top:0; right:0; background:red; color:white; padding:2px 5px; border-radius:50%; cursor:pointer;">✕</span></div>`; });
+    }
+
+    // Chat Logic
+    function listenChat() {
+        db.collection('chats').orderBy('time', 'asc').onSnapshot(s => {
+            const disp = document.getElementById('chatDisplay'); disp.innerHTML = "";
+            s.forEach(doc => {
+                const isMe = doc.data().user === localStorage.getItem('loveUser');
+                disp.innerHTML += `<div style="text-align:${isMe?'right':'left'}">
+                    <div style="background:${isMe?'#ff4d6d':'white'}; color:${isMe?'white':'#444'}; padding:8px 12px; border-radius:15px; display:inline-block;">
+                        ${doc.data().text} <span onclick="delDoc('chats','${doc.id}')" style="font-size:0.6rem; opacity:0.5; cursor:pointer; margin-left:5px;">✕</span>
+                    </div>
+                </div>`;
+            });
+            disp.scrollTop = disp.scrollHeight;
+        });
+    }
+    async function sendChat() { const i = document.getElementById('chatInput'); if(i.value) { await db.collection('chats').add({ user: localStorage.getItem('loveUser'), text: i.value, time: Date.now() }); i.value=""; } }
+
+    // Settings
+    async function updateLogin() {
+        const auth = document.getElementById('authMK').value; if(auth !== ADMIN_SECRET) return alert("Wrong MK!");
+        const nU = document.getElementById('setNewU').value || loginData.user;
+        const nP = document.getElementById('setNewP').value || loginData.pass;
+        const nMK = document.getElementById('setNewMK').value;
+        await db.collection('config').doc('login').set({ user: nU, pass: nP });
+        if(nMK) await db.collection('config').doc('master').set({ key: nMK });
+        alert("Updated!"); logout();
+    }
+
+    // Handle Save Memory
+    async function handleSave() {
+        const f = document.getElementById('photoInput').files[0];
+        if(f) {
+            const reader = new FileReader(); reader.readAsDataURL(f);
+            reader.onload = (e) => {
+                const img = new Image(); img.src = e.target.result;
+                img.onload = async () => {
+                    const canv = document.createElement('canvas'); const scale = 600/img.width;
+                    canv.width=600; canv.height=img.height*scale;
+                    canv.getContext('2d').drawImage(img,0,0,600,canv.height);
+                    await db.collection('memories').add({ text: document.getElementById('memoryText').value, img: canv.toDataURL('image/jpeg', 0.7), time: Date.now() });
+                    location.reload();
+                }
+            }
+        }
+    }
+
+    // Game Logic
+    let playerMap = { X: "Shoron", O: "Tasnim" };
+    async function assignPlayers() { playerMap.X = document.getElementById('playerX').value; playerMap.O = document.getElementById('playerO').value; await db.collection('games').doc('config').set(playerMap); }
+    function listenGame() { 
+        db.collection('games').doc('config').onSnapshot(d => { if(d.exists) playerMap = d.data(); });
+        db.collection('games').doc('ttt').onSnapshot(d => {
+            const data = d.data() || { board: Array(9).fill(""), turn: "X", winner: "" };
+            document.querySelectorAll('.ttt-cell').forEach((c, i) => c.innerText = data.board[i]);
+            document.getElementById('gameStatus').innerText = data.winner ? `Winner: ${playerMap[data.winner] || data.winner}` : `Turn: ${playerMap[data.turn]}`;
+        });
+    }
+    async function makeMove(i) {
+        const d = (await db.collection('games').doc('ttt').get()).data() || { board: Array(9).fill(""), turn: "X", winner: "" };
+        if(d.board[i] || d.winner) return;
+        const nb = [...d.board]; nb[i] = d.turn;
+        const win = checkWinner(nb);
+        if(win) await db.collection('gameStats').add({ winner: playerMap[win], time: Date.now() });
+        await db.collection('games').doc('ttt').set({ board: nb, turn: d.turn==='X'?'O':'X', winner: win || (nb.includes('')?'':'Draw') });
+    }
+    function checkWinner(b) { const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for(let l of lines) { if(b[l[0]] && b[l[0]]===b[l[1]] && b[l[0]]===b[l[2]]) return b[l[0]]; } return null; }
+    async function resetGame() { await db.collection('games').doc('ttt').set({ board: Array(9).fill(""), turn: "X", winner: "" }); }
+    async function loadGameStats() {
+        const snap = await db.collection('gameStats').get(); const wins = { Shoron: 0, Tasnim: 0 };
+        snap.forEach(doc => { if(wins[doc.data().winner] !== undefined) wins[doc.data().winner]++; });
+        if(gameChart) gameChart.destroy();
+        gameChart = new Chart(document.getElementById('gameChart'), { type: 'doughnut', data: { labels: ['Shoron', 'Tasnim'], datasets: [{ data: [wins.Shoron, wins.Tasnim], backgroundColor: ['#ff4d6d', '#444'] }] } });
+    }
+
+    // Delete Logic (Always asks for Master Key)
+    async function delDoc(col, id, cb) { if(prompt("Master Key (Required for Delete):") === ADMIN_SECRET) { await db.collection(col).doc(id).delete(); if(cb) cb(); } else { alert("Wrong Master Key! Cannot delete."); } }
+    
+    // UI Helpers
+    function showSection(id) { document.querySelectorAll('.section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id==='drawTab') setTimeout(initCanvas,100); if(id==='moodTab') loadMoods(); toggleMenu(false); }
+    function toggleMenu(s) { document.getElementById('sideMenu').classList.toggle('active', s); document.getElementById('overlay').style.display = s ? 'block' : 'none'; }
+    function logout() { localStorage.clear(); location.reload(); }
+</script>
+</body>
+</html>
